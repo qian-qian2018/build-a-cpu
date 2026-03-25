@@ -1,0 +1,52 @@
+version: 1
+name: java-backend-us-propose
+stage: propose
+language: zh-CN
+goal: 将单个用户故事转化为可执行的后端需求提案，明确边界、约束与验收方向。
+context: 面向 Java 后端开发，聚焦单维度用户故事，不扩展到跨系统大范围改造。
+inputs:
+  - name: user_story
+    required: true
+    description: 用户故事原文，包含角色、目标与业务价值。
+  - name: business_rules
+    required: false
+    description: 已知业务规则、流程约束、合规要求。
+  - name: system_context
+    required: false
+    description: 现有服务边界、上下游依赖、关键数据实体。
+outputs:
+  - name: propose_brief
+    description: 提案摘要，包含目标、范围、非目标、风险与依赖。
+  - name: acceptance_criteria_draft
+    description: 验收标准草案，使用可验证、可测试的表述。
+  - name: open_questions
+    description: 待确认问题清单，标注优先级与阻塞关系。
+workflow:
+  - step: 澄清用户故事
+    details:
+      - 识别角色、触发条件、主流程与成功结果。
+      - 拆分显性需求与隐性需求，避免语义歧义。
+  - step: 划定范围
+    details:
+      - 明确本次只覆盖单个用户故事所需的后端能力。
+      - 标注不在范围内的功能，防止需求蔓延。
+  - step: 识别约束与风险
+    details:
+      - 记录技术约束，如框架版本、数据库规则、接口兼容要求。
+      - 评估风险来源，如数据一致性、幂等性、并发冲突。
+  - step: 草拟验收标准
+    details:
+      - 每条标准必须可观测、可测试、可判定通过或失败。
+      - 验收标准与业务价值一一对应，避免空泛描述。
+checklist:
+  - 用户故事中的角色、目标、价值是否已被完整复述。
+  - 需求范围与非目标是否明确且无冲突。
+  - 关键依赖与外部前置条件是否已列出。
+  - 验收标准是否具备可测试性与可追踪性。
+quality_gate:
+  pass_condition:
+    - 提案内容可以直接进入设计阶段，不需要再次澄清核心目标。
+    - 所有高优先级阻塞问题均已暴露并被记录。
+  fail_condition:
+    - 需求边界不清，无法判断是否完成。
+    - 验收标准存在不可验证或互相矛盾的表述。

@@ -1,0 +1,52 @@
+version: 1
+name: java-backend-us-validate
+stage: validate
+language: zh-CN
+goal: 对实现结果进行业务与技术双重验证，确认满足验收标准并可安全交付。
+context: 适用于单个用户故事完成后的后端验证，覆盖功能正确性、回归风险与交付证据。
+inputs:
+  - name: implementation_summary
+    required: true
+    description: 实现摘要，包含改动范围、关键设计决策与影响面。
+  - name: acceptance_criteria
+    required: true
+    description: 最终验收标准清单，作为验证基线。
+  - name: test_results
+    required: true
+    description: 自动化与手工测试结果，包含通过/失败信息。
+outputs:
+  - name: validation_report
+    description: 验证报告，逐条映射验收标准与验证结论。
+  - name: release_decision
+    description: 发布建议（可发布/有条件发布/不可发布）及理由。
+  - name: residual_risks
+    description: 剩余风险清单与后续跟踪建议。
+workflow:
+  - step: 对照验收标准逐条验证
+    details:
+      - 为每条验收标准提供明确证据，如接口响应、日志、测试报告。
+      - 对未通过项标记影响级别与阻塞状态。
+  - step: 执行回归与兼容性检查
+    details:
+      - 验证相关旧功能未被破坏，关注关键路径与公共能力。
+      - 检查接口兼容性，确认字段、状态码、错误语义符合约定。
+  - step: 评估非功能质量
+    details:
+      - 审查异常处理、日志可观测性、配置安全性与性能基线。
+      - 确认无明显资源泄漏、死锁风险或超时隐患。
+  - step: 输出发布结论
+    details:
+      - 形成可审计的验证报告，说明通过项、风险项与改进项。
+      - 给出发布建议与回滚关注点，支持上线决策。
+checklist:
+  - 每条验收标准是否都有对应验证证据。
+  - 失败或风险项是否提供了责任人与后续动作。
+  - 回归测试范围是否覆盖本次改动影响面。
+  - 发布建议是否与验证事实保持一致。
+quality_gate:
+  pass_condition:
+    - 所有阻塞级问题已关闭，关键验收标准全部通过。
+    - 验证报告完整，足以支持审计与发布评审。
+  fail_condition:
+    - 存在关键验收标准未通过或证据缺失。
+    - 高风险问题未给出可执行的缓解与回滚方案。
