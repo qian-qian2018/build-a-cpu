@@ -1,0 +1,52 @@
+version: 1
+name: java-backend-us-task-execute
+stage: task-execute
+language: zh-CN
+goal: 按设计产物完成后端实现任务，确保代码、数据库与接口变更可追踪且可回滚。
+context: 面向 Java 后端单维度用户故事实施，强调小步提交与持续可验证。
+inputs:
+  - name: design_doc
+    required: true
+    description: 设计阶段输出文档，包含架构方案、数据模型与接口契约。
+  - name: api_test_cases
+    required: true
+    description: 设计阶段给出的 API 测试用例，作为实现与自测依据。
+  - name: task_breakdown
+    required: true
+    description: 任务拆分清单，含优先级、依赖与完成定义。
+outputs:
+  - name: implementation_changes
+    description: 代码与配置变更说明，关联具体任务与提交记录。
+  - name: migration_scripts
+    description: 数据库变更脚本及执行顺序，包含回滚方案。
+  - name: self_test_report
+    description: 开发自测报告，覆盖功能路径与异常路径。
+workflow:
+  - step: 任务分解与实施顺序确认
+    details:
+      - 将设计拆分为可独立交付的最小任务单元，先处理阻塞项。
+      - 明确每个任务的完成定义与验证方式。
+  - step: 编码实现
+    details:
+      - 按接口契约与领域模型实现业务逻辑，避免偏离设计约束。
+      - 对关键逻辑补充单元测试与必要注释，保障可维护性。
+  - step: 数据与配置变更
+    details:
+      - 编写数据库脚本并验证向前兼容与回滚路径。
+      - 更新运行配置与环境变量文档，避免部署歧义。
+  - step: 本地联调与自测
+    details:
+      - 使用 API 测试用例逐条验证，记录实际结果与差异原因。
+      - 对失败用例快速定位并修复，确保主流程稳定可用。
+checklist:
+  - 每个实现任务是否都能映射到设计文档中的具体条目。
+  - 代码是否遵循项目规范并通过静态检查。
+  - 数据库脚本是否具备可回滚能力并完成演练。
+  - 自测结果是否覆盖成功、失败、边界与并发场景。
+quality_gate:
+  pass_condition:
+    - 功能实现与设计一致，且无阻塞级缺陷。
+    - API 用例执行结果达到预期，关键路径全部通过。
+  fail_condition:
+    - 存在未完成的关键任务或高优先级缺陷。
+    - 数据库或接口变更无法保证兼容与可回滚。

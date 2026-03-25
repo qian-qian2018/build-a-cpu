@@ -1,0 +1,122 @@
+version: 1
+name: java-backend-us-design
+stage: design
+language: zh-CN
+goal: 将提案转化为可实现的后端技术设计，产出接口、数据、异常与测试设计。
+context: 面向 Java 后端单个用户故事，强调低耦合、可测试与向后兼容。
+inputs:
+  - name: propose_brief
+    required: true
+    description: propose 阶段输出的提案摘要。
+  - name: acceptance_criteria_draft
+    required: true
+    description: 可验证的验收标准草案。
+  - name: existing_api_spec
+    required: false
+    description: 既有接口定义，如 OpenAPI 文档或接口约定。
+  - name: data_model_context
+    required: false
+    description: 现有实体模型、表结构与索引信息。
+outputs:
+  - name: design_doc
+    description: 技术设计说明，覆盖接口契约、数据模型、流程与错误处理。
+  - name: api_contract
+    description: API 契约定义，包含路径、方法、参数、响应与状态码。
+  - name: api_test_cases
+    description: API 测试用例集合，覆盖正常、异常、边界、幂等与鉴权场景。
+workflow:
+  - step: 设计接口契约
+    details:
+      - 明确接口路径、HTTP 方法、请求参数、响应结构与状态码。
+      - 约定字段语义、必填规则、默认值、枚举范围与兼容策略。
+  - step: 设计领域与数据模型
+    details:
+      - 建立请求 DTO、领域对象、持久化实体之间的映射关系。
+      - 校验唯一性、索引策略、事务边界与一致性要求。
+  - step: 设计流程与错误处理
+    details:
+      - 定义主流程、分支流程、失败回滚和补偿策略。
+      - 统一错误码与错误消息，避免对外暴露内部实现细节。
+  - step: 设计 API 测试用例
+    details:
+      - 基于验收标准生成可执行用例，覆盖成功、失败、边界、幂等、权限。
+      - 为每个用例指定前置数据、请求参数、预期响应、数据库断言。
+api_test_case_template:
+  - case_id: 用例编号
+    case_title: 用例标题
+    priority: 优先级（P0/P1/P2）
+    preconditions:
+      - 前置条件描述
+    request:
+      method: 请求方法
+      path: 接口路径
+      headers:
+        Authorization: 鉴权信息
+      query: 查询参数
+      body: 请求体
+    expected_response:
+      status_code: 期望状态码
+      body_assertions:
+        - 响应字段断言
+    expected_side_effects:
+      - 数据库变更断言
+      - 事件消息断言
+api_test_cases_example:
+  - case_id: API-US-001
+    case_title: 创建资源成功
+    priority: P0
+    preconditions:
+      - 调用方具备写权限。
+      - 业务主键在系统中不存在。
+    request:
+      method: POST
+      path: /api/v1/resources
+      headers:
+        Authorization: Bearer <有效令牌>
+      query: {}
+      body:
+        name: demo-resource
+        type: standard
+    expected_response:
+      status_code: 201
+      body_assertions:
+        - 返回 id 非空且为字符串。
+        - 返回 name 等于 demo-resource。
+        - 返回 status 等于 CREATED。
+    expected_side_effects:
+      - 数据库新增 1 条资源记录。
+      - 审计日志记录创建动作。
+  - case_id: API-US-002
+    case_title: 重复主键创建失败
+    priority: P0
+    preconditions:
+      - 系统已存在相同业务主键的数据。
+    request:
+      method: POST
+      path: /api/v1/resources
+      headers:
+        Authorization: Bearer <有效令牌>
+      query: {}
+      body:
+        name: demo-resource
+        type: standard
+    expected_response:
+      status_code: 409
+      body_assertions:
+        - 返回错误码为 RESOURCE_ALREADY_EXISTS。
+        - 返回错误消息包含主键冲突提示。
+    expected_side_effects:
+      - 数据库记录总数不增加。
+      - 不发送创建成功事件。
+checklist:
+  - 每个验收标准至少有一个对应的 API 测试用例。
+  - 接口字段、错误码、状态码与业务语义一致。
+  - 关键异常路径已设计并具备可验证断言。
+  - 设计文档可直接支撑开发与联调。
+quality_gate:
+  pass_condition:
+    - 设计文档、接口契约与测试用例三者保持一致且可追踪。
+    - API 测试用例覆盖核心业务路径与高风险场景。
+  fail_condition:
+    - 存在无法实现或无法测试的设计描述。
+    - API 测试用例缺失关键异常场景或验收映射关系。
