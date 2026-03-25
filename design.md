@@ -41,15 +41,12 @@ metadata:
 5. 性能设计
 - 列出接口、重点功能等用户关注的性能点及性能参数
 6. 生成设计文档
-- 根据需求的复杂度和成熟度，选择生成：
-  - **需求详细文档**：适用于功能明确、技术方案清晰的需求，模板在 `assets/requirement_detail_document_template.md`。
-  - **需求设计文档**：适用于需要进一步设计分析的需求，模板在 `assets/requirement_design_document_template.md`。
+- 根据模板`requirement_design_document_template.md`生成，格式请严格遵循模板。
   - **总结方式**：
 	- 使用 Mermaid 流程图展示业务流程
 	- 使用表格对比不同方案
 	- 使用架构图展示系统设计
 	- 使用思维导图展示需求结构
-    - 格式请严格遵循选择的需求详细文档或需求设计文档
 
 ## 质量标准
 
